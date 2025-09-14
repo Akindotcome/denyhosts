@@ -27,9 +27,12 @@ class DenyFileUtilBase(object):
             warn(str(e))
 
     def replace(self):
-        # overwrites deny_file with contents of temp_file
+        # Overwrite deny_file with contents of temp_file (Windows-safe)
         try:
-            os.rename(self.temp_file, self.deny_file)
+            if os.path.exists(self.deny_file):
+                os.remove(self.deny_file)
+            # os.replace would also work on Py3.3+, but we keep explicit remove for clarity
+            os.replace(self.temp_file, self.deny_file)
         except Exception as e:
             print(e)
 

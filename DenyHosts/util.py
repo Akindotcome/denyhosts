@@ -8,6 +8,7 @@ from subprocess import Popen, PIPE
 import sys
 from textwrap import dedent
 import time
+import socket
 py_version = sys.version_info
 if py_version[0] == 2:
     # python 2
@@ -25,6 +26,25 @@ from .regex import TIME_SPEC_REGEX
 debug = logging.getLogger("util").debug
 ipv4_regex = re.compile(r'^([0-9]+\.){3}[0-9]+$')
 
+def gethostbyname(hostname):
+    """
+    Robust resolver: try system DNS first; if that fails, parse common
+    OVH-style hostnames like '68.ip-51-38-131.eu' into '51.38.131.68'.
+    """
+    try:
+        return socket.gethostbyname(hostname)
+    except Exception:
+        # Fallback: <last>.ip-<a>-<b>-<c>.<domain...>
+        # Example: 68.ip-51-38-131.eu -> 51.38.131.68
+        m = re.match(
+            r'^(?P<last>\d+)\.ip-(?P<a>\d+)-(?P<b>\d+)-(?P<c>\d+)\.',
+            hostname
+        )
+        if m:
+            a, b, c, last = m.group('a', 'b', 'c', 'last')
+            return f"{a}.{b}.{c}.{last}"
+        # If we can’t parse, re-raise the original failure
+        raise
 
 def setup_logging(prefs, enable_debug, verbose, daemon):
         daemon_log = prefs.get('DAEMON_LOG')
