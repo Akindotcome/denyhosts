@@ -35,6 +35,7 @@ class Prefs(dict):
                        'PLUGIN_DENY': None,
                        'PLUGIN_PURGE': None,
                        'IPTABLES': None,
+                       'IP6TABLES': None,           # <-- new (optional path to ip6tables)
                        'BLOCKPORT': None,
                        'PFCTL_PATH': None,
                        'PF_TABLE': None,
@@ -99,6 +100,7 @@ class Prefs(dict):
                          'HOSTS_DENY',
                          'DAEMON_LOG',
                          'IPTABLES',
+                         'IP6TABLES',        # <-- new: make absolute if provided
                          'PFCTL_PATH',
                          'PF_TABLE_FILE')
 
